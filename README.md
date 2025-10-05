@@ -142,13 +142,15 @@ You must use JSON as the on-disk format. A simple, beginner-friendly approach is
 project_root/
   todo_list/
     __init__.py
-    cli.py          # argparse or click entry points
-    storage.py      # file persistence (JSON)
-    models.py       # domain models, dataclasses
-    services.py     # operations on lists & items
-    version.py      # __version__ = "0.1.0"
-  tests/            # required — include comprehensive pytest unit tests
-  pyproject.toml    # packaging config (recommended)
+    cli.py                  # program entry point, parse args, create service, call commands
+    storage.py              # file persistence (JSON)
+    models.py               # domain models, dataclasses
+    services.py             # operations on lists & items
+    version.py              # __version__ = "0.1.0"
+  tests/                    # required — include comprehensive pytest unit tests
+  pyproject.toml            # packaging config (recommended)
+  requirements.txt
+  build_requirements.txt
   README.md
   LICENSE
 ```
@@ -172,7 +174,7 @@ Option A: pyproject.toml (recommended)
     description = "A simple CLI todo manager supporting multiple lists"
     authors = [{name = "Your Name"}]
     readme = "README.md"
-    requires-python = ">=3.9"
+    requires-python = ">=3.11"
     classifiers = [
       "Programming Language :: Python :: 3",
       "License :: OSI Approved :: MIT License",
@@ -249,17 +251,8 @@ Below are illustrative examples of how your CLI could behave.
 ## Stretch Goals (Optional)
 - Add `--json` output mode for commands that display data.
 - Support priorities, due dates, tags, and filtering.
-- Implement simple unit tests for core operations.
 - Add `export`/`import` commands.
 
----
-
-## Getting Started (Quick Setup)
-1. Clone your project repository.
-2. Create and activate a virtual environment.
-3. Implement the CLI according to this README.
-4. Build the wheel and install it locally.
-5. Verify commands with `todo --help` and the examples above.
 
 Good luck, and have fun building! 🎯
 
@@ -286,3 +279,83 @@ Guidelines:
 - Use fixtures and monkeypatching to isolate filesystem and environment (e.g., set `APPDATA` to a temp directory).
 - Test both success paths and error handling (non-zero exit codes, user messages, and logging hints).
 - Keep tests deterministic: avoid relying on actual timestamps beyond format validation.
+
+
+
+---
+## Demonstration
+Below is the terminal output of a successful installation and use of the project.
+
+```terminal
+D:\Windows\Users\fanni\dev>python -m venv venv_todo_list
+
+D:\Windows\Users\fanni\dev>venv_todo_list\Scripts\activate
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>pip install D:\Windows\Users\fanni\dev\todo_list\todo_list_cli-0.1.0-py3-none-any.whl
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Processing d:\windows\users\fanni\dev\todo_list\todo_list_cli-0.1.0-py3-none-any.whl
+Installing collected packages: todo-list-cli
+Successfully installed todo-list-cli-0.1.0
+
+[notice] A new release of pip is available: 24.0 -> 25.2
+[notice] To update, run: python.exe -m pip install --upgrade pip
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo init
+Initialized storage at C:\Users\fanni\AppData\Roaming\todo_list
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo create-list work
+Created list 'work'
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo create-list home
+Created list 'home'
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo add work "Email team about Q4 goals"
+List 'work' updated. Added: Email team about Q4 goals (id 1).
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo add home "Stop by the grocery store - milk, eggs"
+List 'home' updated. Added: Stop by the grocery store - milk, eggs (id 1).
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo show work
+List: work
+    1 [ ] Email team about Q4 goals
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo show home
+List: home
+    1 [ ] Stop by the grocery store - milk, eggs
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo add work "Schedule happy hour"
+List 'work' updated. Added: Schedule happy hour (id 2).
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo show work
+List: work
+    1 [ ] Email team about Q4 goals
+    2 [ ] Schedule happy hour
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo complete work 1
+usage: todo [-h] {init,list-lists,create-list,delete-list,add,remove,completed,show,show-completed,finished,version} ...
+todo: error: argument cmd: invalid choice: 'complete' (choose from 'init', 'list-lists', 'create-list', 'delete-list', 'add', 'remove', 'completed', 'show', 'show-completed', 'finished', 'version')
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo completed work 1
+Marked item 1 as completed in 'work'
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo show work
+List: work
+    1 [✓] Email team about Q4 goals
+    2 [ ] Schedule happy hour
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo show-completed work
+List: work
+    1 [✓] Email team about Q4 goals
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo remove work 2
+Removed item 2 from 'work'
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo show work
+List: work
+    1 [✓] Email team about Q4 goals
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>todo delete-list home --yes
+Deleted list 'home'
+
+(venv_todo_list) D:\Windows\Users\fanni\dev>
+```
